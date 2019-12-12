@@ -1,0 +1,54 @@
+{
+    "name": "bozboz/backpack-revisions",
+    "description": "",
+    "keywords": [
+        "bozboz",
+        "backpack-revisions"
+    ],
+    "homepage": "https://gitlab.bozboz.co.uk/laravel-packages/backpack-revisions",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mike Prosser",
+            "email": "mike.prosser@bozboz.co.uk",
+            "role": "Developer"
+        },
+        {
+            "name": "Jim Hollington",
+            "email": "jim@bozboz.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.3",
+        "orchestra/testbench": "^4.4",
+        "phpunit/phpunit": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bozboz\\BackpackRevisions\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bozboz\\BackpackRevisions\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bozboz\\BackpackRevisions\\BackpackRevisionServiceProvider"
+            ]
+        }
+    }
+}
