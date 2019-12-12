@@ -3,6 +3,7 @@
 namespace Bozboz\BackpackRevisions;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Schema\Blueprint;
 
 class BackpackRevisionServiceProvider extends ServiceProvider
 {
@@ -15,14 +16,6 @@ class BackpackRevisionServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path('backpack-revisions.php'),
             ], 'config');
-
-            /*
-            $this->loadViewsFrom(__DIR__.'/../resources/views', 'backpack-revisions');
-
-            $this->publishes([
-                __DIR__.'/../resources/views' => base_path('resources/views/vendor/backpack-revisions'),
-            ], 'views');
-            */
         }
     }
 
@@ -32,5 +25,16 @@ class BackpackRevisionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'backpack-revisions');
+
+        Blueprint::macro('revisionable', function() {
+            $table->uuid('uuid')->index();
+            $table->boolean('is_published');
+            $table->boolean('is_current');
+        });
+        Blueprint::macro('dropRevisionable', function() {
+            $table->dropColumn('uuid');
+            $table->dropColumn('is_published');
+            $table->dropColumn('is_current');
+        });
     }
 }
