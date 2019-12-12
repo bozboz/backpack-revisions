@@ -65,6 +65,7 @@ composer:
   artifacts:
     paths:
       - vendor/
+      - composer.lock
       # - .env
     expire_in: 1 days
     when: always
@@ -149,7 +150,8 @@ sensiolabs:
     - cd security-checker
     - composer install
     - php security-checker security:check ../composer.lock
-  dependencies: []
+  dependencies:
+    - composer
   cache:
     paths:
       - security-checker/
