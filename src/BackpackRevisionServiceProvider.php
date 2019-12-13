@@ -26,12 +26,12 @@ class BackpackRevisionServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'backpack-revisions');
 
-        Blueprint::macro('revisionable', function() {
+        Blueprint::macro('revisionable', function () {
             $table->uuid('uuid')->index();
             $table->boolean('is_published');
             $table->boolean('is_current');
         });
-        Blueprint::macro('dropRevisionable', function() {
+        Blueprint::macro('dropRevisionable', function () {
             $table->dropColumn('uuid');
             $table->dropColumn('is_published');
             $table->dropColumn('is_current');

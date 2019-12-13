@@ -47,6 +47,10 @@ trait RevisionOperation
                 // 'disabled' => 'disabled'
             ]
         ]);
+        $this->crud->addField([
+            'name' => 'save_action',
+            'type' => 'text',
+        ]);
     }
 
     protected function setupRevisionsRoutes($segment, $routeName, $controller)

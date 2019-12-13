@@ -37,7 +37,7 @@ trait RevisionableTrait
         });
 
         static::updating(function ($model) {
-            // $model->newRevision();
+            $model->newRevision();
         });
 
         static::updated(function ($model) {
@@ -45,10 +45,9 @@ trait RevisionableTrait
         });
     }
 
-
     protected function performUpdate(Builder $query)
     {
-        dump($this->original);
+        dump($this->attributes, $this->original);
         parent::performUpdate($query);
         dd($this->original);
         if ($this->fireModelEvent('updating') === false) {
@@ -80,30 +79,20 @@ trait RevisionableTrait
         return true;
     }
 
-    protected function newPublished()
+    protected function newRevision()
     {
-        $storedVersion = get_class($this)::where('id', $this->id)->first();
+        $this->withoutEventDispatcher(function () {
+            $revision = $this->replicate();
+            $revision->created_at = $this->created_at;
+            $revision->updated_at = $this->getOriginal('updated_at');
+            $revision->is_published = false;
+            $revision->is_current = false;
+            $revision->save();
 
-        $newVersion = $storedVersion->replicate();
-        $newVersion->created_at = $storedVersion->created_at;
-        $newVersion->updated_at = $storedVersion->updated_at;
-
-        $needToUnpubOld = !$newVersion->is_published;
-
-        $newVersion->is_published = false;
-        $newVersion->is_current = false;
-        $newVersion->save();
-
-        $this->is_published = true;
-
-        if ($needToUnpubOld) {
-            // We have to do this as a raw db query, as using the helpers
-            // starts a cyclical new update which then repeats the above code
-            DB::table($this->table)
-                ->where('uuid', $this->uuid)
-                ->where('is_published', true)
-                ->update(['is_published' => false]);
-        }
+            if ($this->is_published) {
+                $this->setLive();
+            }
+        });
     }
 
     protected function newDraft()
@@ -130,11 +119,6 @@ trait RevisionableTrait
         $query->where('is_published', true);
     }
 
-    public function getHasDraftsAttribute()
-    {
-        return $this->is_published ? '' : '✅';
-    }
-
     public function revisions()
     {
         return $this->hasMany(static::class, 'uuid', 'uuid')->where('id', '<>', $this->id)->orderBy('updated_at');
@@ -147,13 +131,16 @@ trait RevisionableTrait
 
     public function generateUuid()
     {
+        if ($this->uuid) {
+            return;
+        }
         $this->uuid = (string) Uuid::generate();
     }
 
     public function setCurrent()
     {
         $this->withoutEventDispatcher(function () {
-            static::uuid($this->uuid)->update(['is_current' => false]);
+            $this->revisions()->update(['is_current' => false]);
             $this->setAttribute('is_current', true)->save();
         });
     }
@@ -161,7 +148,7 @@ trait RevisionableTrait
     public function setLive()
     {
         $this->withoutEventDispatcher(function () {
-            static::uuid($this->uuid)->published()->update(['is_published' => false]);
+            $this->revisions()->published()->update(['is_published' => false]);
 
             $this->is_published = true;
             $this->is_current = true;
