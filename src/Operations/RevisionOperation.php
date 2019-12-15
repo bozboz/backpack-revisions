@@ -47,10 +47,6 @@ trait RevisionOperation
                 // 'disabled' => 'disabled'
             ]
         ]);
-        $this->crud->addField([
-            'name' => 'save_action',
-            'type' => 'text',
-        ]);
     }
 
     protected function setupRevisionsRoutes($segment, $routeName, $controller)
@@ -74,12 +70,6 @@ trait RevisionOperation
         );
     }
 
-    protected function setupRevisionOperation()
-    {
-        // TODO: remove setFromDb() and manually define Columns, maybe Filters
-        $this->crud->setFromDb();
-    }
-
     public function publishRevision($id)
     {
         $this->crud->getEntry($id)->setLive();
@@ -101,7 +91,7 @@ trait RevisionOperation
         $this->crud->versions = $this->crud->entry->revisions->merge([$this->data['entry']]);
 
         // load the view from /resources/views/vendor/backpack/crud/ if it exists, otherwise load the one in the package
-        return view($this->crud->getListView(), $this->data);
+        return view('backpack::crud.revisions', $this->data);
     }
 
     /**
