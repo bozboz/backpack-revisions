@@ -3,7 +3,9 @@
 namespace Bozboz\BackpackRevisions\Traits;
 
 use Webpatser\Uuid\Uuid;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder;
 
 trait RevisionableTrait
@@ -43,70 +45,23 @@ trait RevisionableTrait
         static::updated(function ($model) {
             $model->setCurrent();
         });
-    }
 
-    protected function performUpdate(Builder $query)
-    {
-        dump($this->attributes, $this->original);
-        parent::performUpdate($query);
-        dd($this->original);
-        if ($this->fireModelEvent('updating') === false) {
-            return false;
-        }
-
-        $saveAction = \Request::input('save_action', session('update')['saveAction']);
-
-        if ($saveAction == 'save_as_draft') {
-            $this->newDraft();
-        } else {
-            $this->newPublished();
-        }
-
-        if ($this->usesTimestamps()) {
-            $this->updateTimestamps();
-        }
-
-        $dirty = $this->getDirty();
-
-        if (count($dirty) > 0) {
-            $this->setKeysForSaveQuery($query)->update($dirty);
-
-            $this->syncChanges();
-
-            $this->fireModelEvent('updated', false);
-        }
-
-        return true;
+        static::deleted(function ($model) {
+            $model->revisions()->delete();
+        });
     }
 
     protected function newRevision()
     {
-        $this->withoutEventDispatcher(function () {
-            $revision = $this->replicate();
+        $this->withoutEvents(function () {
+            $revision = $this->fresh()->replicate();
             $revision->created_at = $this->created_at;
-            $revision->updated_at = $this->getOriginal('updated_at');
-            $revision->is_published = false;
-            $revision->is_current = false;
             $revision->save();
 
-            if ($this->is_published) {
+            if (! Str::contains('draft', Request::input('save_action'))) {
                 $this->setLive();
             }
         });
-    }
-
-    protected function newDraft()
-    {
-        $storedVersion = get_class($this)::where('id', $this->id)->first();
-
-        $newVersion = $storedVersion->replicate();
-        $newVersion->created_at = $storedVersion->created_at;
-        $newVersion->updated_at = $storedVersion->updated_at;
-
-        $newVersion->is_current = false;
-        $newVersion->save();
-
-        $this->is_published = false;
     }
 
     public function scopeCurrent($query)
@@ -139,7 +94,7 @@ trait RevisionableTrait
 
     public function setCurrent()
     {
-        $this->withoutEventDispatcher(function () {
+        $this->withoutEvents(function () {
             $this->revisions()->update(['is_current' => false]);
             $this->setAttribute('is_current', true)->save();
         });
@@ -147,12 +102,11 @@ trait RevisionableTrait
 
     public function setLive()
     {
-        $this->withoutEventDispatcher(function () {
+        $this->withoutEvents(function () {
             $this->revisions()->published()->update(['is_published' => false]);
 
             $this->is_published = true;
-            $this->is_current = true;
-            $this->save();
+            $this->setCurrent();
 
             static::where('updated_at', '>', $this->updated_at)->delete();
         });

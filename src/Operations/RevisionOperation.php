@@ -74,6 +74,12 @@ trait RevisionOperation
         );
     }
 
+    protected function setupRevisionOperation()
+    {
+        // TODO: remove setFromDb() and manually define Columns, maybe Filters
+        $this->crud->setFromDb();
+    }
+
     public function publishRevision($id)
     {
         $this->crud->getEntry($id)->setLive();
@@ -83,20 +89,19 @@ trait RevisionOperation
 
     public function revisions()
     {
-        $this->crud->hasAccessOrFail('revisions');
+        // $this->crud->hasAccessOrFail('revisions');
 
-        // get entry ID from Request (makes sure its the last ID for nested resources)
-        $id = $this->crud->getCurrentEntryId() ?? $id;
+        $id = $this->crud->getCurrentEntryId();
 
         // get the info for that entry
         $this->data['entry'] = $this->crud->getEntry($id);
         $this->data['crud'] = $this->crud;
         $this->data['title'] = 'Revisions for '.$this->crud->entity_name;
 
-        $this->crud->versions = $this->crud->entry->revisions;
+        $this->crud->versions = $this->crud->entry->revisions->merge([$this->data['entry']]);
 
         // load the view from /resources/views/vendor/backpack/crud/ if it exists, otherwise load the one in the package
-        return view('backpack::crud.revisions', $this->data);
+        return view($this->crud->getListView(), $this->data);
     }
 
     /**
@@ -114,11 +119,11 @@ trait RevisionOperation
             }
         );
 
-        // $this->crud->operation(
-        //     'list',
-        //     function () {
-        //         $this->crud->addButton('line', 'revisions', 'view', 'crud::buttons.revisions', 'beginning');
-        //     }
-        // );
+        $this->crud->operation(
+            'list',
+            function () {
+                $this->crud->addButton('line', 'revisions', 'view', 'crud::buttons.revisions', 'beginning');
+            }
+        );
     }
 }
