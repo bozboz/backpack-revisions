@@ -30,11 +30,14 @@ class BackpackRevisionServiceProvider extends ServiceProvider
             $table->uuid('uuid')->index();
             $table->boolean('is_published');
             $table->boolean('is_current');
+            $table->integer('user_id');
         });
+
         Blueprint::macro('dropRevisionable', function () {
             $table->dropColumn('uuid');
             $table->dropColumn('is_published');
             $table->dropColumn('is_current');
+            $table->integer('user_id');
         });
     }
 }

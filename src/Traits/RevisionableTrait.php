@@ -20,6 +20,7 @@ trait RevisionableTrait
         $this->fillable[] = 'uuid';
         $this->fillable[] = 'is_published';
         $this->fillable[] = 'is_current';
+        $this->fillable[] = 'user_id';
     }
 
     /**
@@ -32,6 +33,7 @@ trait RevisionableTrait
         static::creating(function ($model) {
             $model->generateUuid();
             $model->is_current = true;
+            $model->user_id = backpack_user()->id;
 
             if (Str::contains(Request::input('save_action'), 'draft')) {
                 $model->setAttribute('is_published', false);
@@ -61,6 +63,8 @@ trait RevisionableTrait
             $revision->updated_at = $this->updated_at;
 
             $revision->save(['timestamps' => false]); // Preserve the existing updated_at
+
+            $this->setAttribute('user_id', backpack_user()->id);
 
             if (Str::contains(Request::input('save_action'), 'draft')) {
                 $this->setAttribute('is_published', false);
