@@ -17,6 +17,8 @@ class BackpackRevisionServiceProvider extends ServiceProvider
                 __DIR__.'/../config/config.php' => config_path('backpack-revisions.php'),
             ], 'config');
         }
+
+        $this->loadViewsFrom(realpath(__DIR__.'/resources/views'), 'backpack-revisions');
     }
 
     /**
