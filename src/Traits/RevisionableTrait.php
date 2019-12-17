@@ -33,8 +33,10 @@ trait RevisionableTrait
             $model->generateUuid();
             $model->is_current = true;
 
-            if (! key_exists('is_published', $model->attributes)) {
-                $model->is_published = false;
+            if (Str::contains(Request::input('save_action'), 'draft')) {
+                $model->setAttribute('is_published', false);
+            } else {
+                $model->setAttribute('is_published', true);
             }
         });
 
