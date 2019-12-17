@@ -2,6 +2,7 @@
 
 namespace Bozboz\BackpackRevisions\Traits;
 
+use App\User;
 use Webpatser\Uuid\Uuid;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -87,6 +88,11 @@ trait RevisionableTrait
     public function revisions()
     {
         return $this->hasMany(static::class, 'uuid', 'uuid')->where('id', '<>', $this->id)->orderBy('updated_at');
+    }
+
+    public function user()
+    {
+        return User::where('id', $this->user_id)->first();
     }
 
     public function scopeUuid($query, $uuid)
