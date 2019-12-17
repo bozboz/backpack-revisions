@@ -58,7 +58,9 @@ trait RevisionableTrait
         $this->withoutEvents(function () {
             $revision = $this->fresh()->replicate();
             $revision->created_at = $this->created_at;
-            $revision->save();
+            $revision->updated_at = $this->updated_at;
+
+            $revision->save(['timestamps' => false]); // Preserve the existing updated_at
 
             if (Str::contains(Request::input('save_action'), 'draft')) {
                 $this->setAttribute('is_published', false);
@@ -99,7 +101,12 @@ trait RevisionableTrait
     public function setCurrent()
     {
         $this->withoutEvents(function () {
-            $this->revisions()->update(['is_current' => false]);
+            // This has to be updated manually as with update() there's no way to prevent timestamp updates, which breaks thei history of the updated_at timestamp
+            $oldCurrent = $this->revisions()->where('is_current', true)->first();
+            $oldCurrent->is_current = false;
+            $oldCurrent->timestamps = false;
+            $oldCurrent->save();
+
             $this->setAttribute('is_current', true)->save();
         });
     }
@@ -107,7 +114,11 @@ trait RevisionableTrait
     public function setLive()
     {
         $this->withoutEvents(function () {
-            $this->revisions()->published()->update(['is_published' => false]);
+            // This has to be updated manually as with update() there's no way to prevent timestamp updates, which breaks thei history of the updated_at timestamp
+            $oldPublished = $this->revisions()->where('is_published', true)->first();
+            $oldPublished->is_published = false;
+            $oldPublished->timestamps = false;
+            $oldPublished->save();
 
             $this->is_published = true;
             $this->setCurrent();
