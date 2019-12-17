@@ -89,6 +89,7 @@ trait RevisionOperation
         $this->data['title'] = 'Revisions for '.$this->crud->entity_name;
 
         $this->crud->versions = $this->crud->entry->revisions->merge([$this->data['entry']]);
+        $this->crud->versions = $this->crud->versions->sortBy('created_at');
 
         // load the view from /resources/views/vendor/backpack/crud/ if it exists, otherwise load the one in the package
         return view('backpack::crud.revisions', $this->data);
