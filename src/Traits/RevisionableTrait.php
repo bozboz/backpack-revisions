@@ -58,7 +58,9 @@ trait RevisionableTrait
             $revision->created_at = $this->created_at;
             $revision->save();
 
-            if (! Str::contains('draft', Request::input('save_action'))) {
+            if (Str::contains(Request::input('save_action'), 'draft')) {
+                $this->setAttribute('is_published', false);
+            } else {
                 $this->setLive();
             }
         });
