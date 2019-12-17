@@ -101,7 +101,8 @@ trait RevisionableTrait
     public function setCurrent()
     {
         $this->withoutEvents(function () {
-            // This has to be updated manually as with update() there's no way to prevent timestamp updates, which breaks thei history of the updated_at timestamp
+            // This has to be updated manually as with update() there's no way to prevent timestamp updates,
+            // which breaks the history of the updated_at timestamp
             $oldCurrent = $this->revisions()->where('is_current', true)->first();
             if ($oldCurrent) {
                 $oldCurrent->is_current = false;
@@ -118,7 +119,8 @@ trait RevisionableTrait
         $this->withoutEvents(function () {
             static::where('updated_at', '>', $this->updated_at)->delete();
 
-            // This has to be updated manually as with update() there's no way to prevent timestamp updates, which breaks thei history of the updated_at timestamp
+            // This has to be updated manually as with update() there's no way to prevent timestamp updates,
+            // which breaks the history of the updated_at timestamp
             $oldPublished = $this->revisions()->where('is_published', true)->first();
             if ($oldPublished) {
                 $oldPublished->is_published = false;
