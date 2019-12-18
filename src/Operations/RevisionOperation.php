@@ -112,7 +112,8 @@ trait RevisionOperation
         $this->crud->operation(
             'list',
             function () {
-                $this->crud->addButton('line', 'revisions', 'view', 'backpack-revisions::crud.buttons.revisions', 'beginning');
+                $this->crud->addButton('line', 'revisions', 'view',
+                    'backpack-revisions::crud.buttons.revisions', 'beginning');
             }
         );
     }
