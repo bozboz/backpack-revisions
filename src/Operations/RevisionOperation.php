@@ -70,6 +70,11 @@ trait RevisionOperation
         );
     }
 
+    public function getHasDraftsAttribute()
+    {
+        return $this->is_published ? '' : '✅';
+    }
+
     public function publishRevision($id)
     {
         $this->crud->getEntry($id)->setLive();
@@ -112,8 +117,13 @@ trait RevisionOperation
         $this->crud->operation(
             'list',
             function () {
-                $this->crud->addButton('line', 'revisions', 'view',
-                    'backpack-revisions::crud.buttons.revisions', 'beginning');
+                $this->crud->addButton(
+                    'line',
+                    'revisions',
+                    'view',
+                    'backpack-revisions::crud.buttons.revisions',
+                    'beginning'
+                );
             }
         );
     }
