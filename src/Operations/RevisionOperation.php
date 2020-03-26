@@ -11,9 +11,9 @@ trait RevisionOperation
         $this->crud->addClause('current');
 
         $this->crud->addColumn([
-            'name' => 'hasDrafts',
+            'name' => 'is_published',
             'type' => 'check',
-            'label' => 'Has Drafts'
+            'label' => 'Published?'
         ]);
         $this->crud->addColumn([
             'name' => 'uuid',
@@ -72,7 +72,12 @@ trait RevisionOperation
 
     public function getHasDraftsAttribute()
     {
-        return $this->is_published ? '' : '✅';
+        if ($this->is_published) {
+            return 'no';
+        } else {
+            return 'yes';
+        }
+        // return ($this->is_published ? '' : '✅');
     }
 
     public function publishRevision($id)
