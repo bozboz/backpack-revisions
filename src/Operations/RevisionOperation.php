@@ -24,10 +24,14 @@ trait RevisionOperation
 
     protected function revisionCreateFunctionality()
     {
-        $this->data['draftAction'] = [
-            'active' => [ 'value' => 'save_as_draft', 'label' => 'Save as draft' ],
-            'options' => [],
-        ];
+        $this->crud->addSaveAction([
+            'name' => 'save_as_draft',
+            'redirect' => function($crud,$request,$itemId) {
+                return $crud->route;
+            },
+            'button_text' => 'Save as draft',
+            'order' => 1
+        ]);
 
         $this->crud->addField([
             'name' => 'hasDrafts',
