@@ -37,15 +37,6 @@ trait RevisionOperation
                 'disabled' => 'disabled'
             ]
         ]);
-        $this->crud->addField([
-            'name' => 'uuid',
-            'label' => 'UUID',
-            'type' => 'text',
-            'attributes' => [
-                'readonly' => 'readonly',
-                // 'disabled' => 'disabled'
-            ]
-        ]);
     }
 
     protected function setupRevisionsRoutes($segment, $routeName, $controller)
