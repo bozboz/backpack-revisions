@@ -21,7 +21,7 @@ trait RevisionOperation
     {
         $this->crud->addSaveAction([
             'name' => 'save_as_draft',
-            'redirect' => function($crud,$request,$itemId) {
+            'redirect' => function ($crud, $request, $itemId) {
                 return $crud->route;
             },
             'button_text' => 'Save as draft',
