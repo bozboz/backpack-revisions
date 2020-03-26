@@ -15,11 +15,6 @@ trait RevisionOperation
             'type' => 'check',
             'label' => 'Published?'
         ]);
-        $this->crud->addColumn([
-            'name' => 'uuid',
-            'type' => 'text',
-            'label' => 'UUID'
-        ]);
     }
 
     protected function revisionCreateFunctionality()
