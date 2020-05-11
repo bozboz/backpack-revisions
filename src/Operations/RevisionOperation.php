@@ -24,25 +24,25 @@ trait RevisionOperation
             [
                 [
                     'name' => 'save_as_draft',
-                    'visible' => function($crud) {
+                    'visible' => function ($crud) {
                         return true;
                     },
                     'button_text' => 'Save as Draft'
                 ],
                 [
                     'name' => 'save_and_back',
-                    'visible' => function($crud) {
+                    'visible' => function ($crud) {
                         return true;
                     },
                     'button_text' => 'Publish and Back'
                 ],
                 [
                     'name' => 'save_and_edit',
-                    'visible' => function($crud) {
+                    'visible' => function ($crud) {
                         return true;
                     },
                     'button_text' => 'Publish and Edit',
-                    'redirect' => function($crud, $request, $itemId) {
+                    'redirect' => function ($crud, $request, $itemId) {
                         return $crud->route . '/' . $itemId . '/edit';
                     },
                 ]
