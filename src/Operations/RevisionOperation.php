@@ -19,14 +19,35 @@ trait RevisionOperation
 
     protected function revisionCreateFunctionality()
     {
-        $this->crud->addSaveAction([
-            'name' => 'save_as_draft',
-            'redirect' => function ($crud, $request, $itemId) {
-                return $crud->route;
-            },
-            'button_text' => 'Save as draft',
-            'order' => 1
-        ]);
+
+        $this->crud->replaceSaveActions(
+            [
+                [
+                    'name' => 'save_as_draft',
+                    'visible' => function($crud) {
+                        return true;
+                    },
+                    'button_text' => 'Save as Draft'
+                ],
+                [
+                    'name' => 'save_and_back',
+                    'visible' => function($crud) {
+                        return true;
+                    },
+                    'button_text' => 'Publish and Back'
+                ],
+                [
+                    'name' => 'save_and_edit',
+                    'visible' => function($crud) {
+                        return true;
+                    },
+                    'button_text' => 'Publish and Edit',
+                    'redirect' => function($crud, $request, $itemId) {
+                        return $crud->route . '/' . $itemId . '/edit';
+                    },
+                ]
+            ]
+        );
 
         $this->crud->addField([
             'name' => 'hasDrafts',
